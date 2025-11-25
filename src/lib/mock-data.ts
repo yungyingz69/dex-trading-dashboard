@@ -1,0 +1,256 @@
+import type { Bot, Trade, Alert, Asset } from '@/types'
+
+// Mock Bots Data
+export const mockBots: Bot[] = [
+  {
+    id: 'bot-1',
+    name: 'ETH Grid Bot',
+    type: 'grid',
+    status: 'running',
+    pair: 'ETH/USDT',
+    exchange: 'Uniswap',
+    profit: 1250.5,
+    profitPercent: 12.5,
+    trades: 156,
+    uptime: 720,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'bot-2',
+    name: 'SOL DCA Bot',
+    type: 'dca',
+    status: 'running',
+    pair: 'SOL/USDT',
+    exchange: 'Jupiter',
+    profit: 850.25,
+    profitPercent: 8.5,
+    trades: 48,
+    uptime: 480,
+    createdAt: new Date('2024-01-05'),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'bot-3',
+    name: 'BTC Arbitrage',
+    type: 'arbitrage',
+    status: 'stopped',
+    pair: 'BTC/USDT',
+    exchange: 'Multi-DEX',
+    profit: -120.0,
+    profitPercent: -2.4,
+    trades: 23,
+    uptime: 0,
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'bot-4',
+    name: 'MATIC Grid',
+    type: 'grid',
+    status: 'error',
+    pair: 'MATIC/USDT',
+    exchange: 'QuickSwap',
+    profit: 320.75,
+    profitPercent: 6.4,
+    trades: 89,
+    uptime: 0,
+    createdAt: new Date('2024-01-12'),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'bot-5',
+    name: 'AVAX DCA',
+    type: 'dca',
+    status: 'syncing',
+    pair: 'AVAX/USDT',
+    exchange: 'TraderJoe',
+    profit: 0,
+    profitPercent: 0,
+    trades: 0,
+    uptime: 0,
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date(),
+  },
+]
+
+// Mock Trades Data
+export const mockTrades: Trade[] = [
+  {
+    id: '1',
+    botId: 'bot-1',
+    type: 'buy',
+    pair: 'ETH/USDT',
+    price: 3450.25,
+    amount: 0.5,
+    total: 1725.13,
+    timestamp: new Date('2024-01-15T10:30:00'),
+  },
+  {
+    id: '2',
+    botId: 'bot-1',
+    type: 'sell',
+    pair: 'ETH/USDT',
+    price: 3520.50,
+    amount: 0.5,
+    total: 1760.25,
+    profit: 35.12,
+    timestamp: new Date('2024-01-15T11:45:00'),
+  },
+  {
+    id: '3',
+    botId: 'bot-2',
+    type: 'buy',
+    pair: 'SOL/USDT',
+    price: 98.75,
+    amount: 10,
+    total: 987.50,
+    timestamp: new Date('2024-01-15T12:15:00'),
+  },
+  {
+    id: '4',
+    botId: 'bot-2',
+    type: 'sell',
+    pair: 'SOL/USDT',
+    price: 102.30,
+    amount: 10,
+    total: 1023.00,
+    profit: 35.50,
+    timestamp: new Date('2024-01-15T14:20:00'),
+  },
+  {
+    id: '5',
+    botId: 'bot-3',
+    type: 'buy',
+    pair: 'BTC/USDT',
+    price: 42150.00,
+    amount: 0.05,
+    total: 2107.50,
+    timestamp: new Date('2024-01-15T15:00:00'),
+  },
+]
+
+// Mock Alerts Data
+export const mockAlerts: Alert[] = [
+  {
+    id: 'alert-1',
+    type: 'price',
+    name: 'ETH Price Alert',
+    condition: 'above',
+    threshold: 4000,
+    asset: 'ETH',
+    enabled: true,
+    channels: ['push', 'telegram'],
+    createdAt: new Date('2024-01-10'),
+  },
+  {
+    id: 'alert-2',
+    type: 'price',
+    name: 'BTC Dip Alert',
+    condition: 'below',
+    threshold: 40000,
+    asset: 'BTC',
+    enabled: true,
+    channels: ['push', 'discord'],
+    createdAt: new Date('2024-01-11'),
+  },
+  {
+    id: 'alert-3',
+    type: 'bot_status',
+    name: 'Bot Error Alert',
+    condition: 'equals',
+    threshold: 0,
+    botId: 'bot-1',
+    enabled: true,
+    channels: ['push', 'telegram', 'email'],
+    createdAt: new Date('2024-01-12'),
+  },
+  {
+    id: 'alert-4',
+    type: 'pnl',
+    name: 'Profit Target',
+    condition: 'above',
+    threshold: 5000,
+    enabled: true,
+    channels: ['push'],
+    createdAt: new Date('2024-01-13'),
+    triggeredAt: new Date('2024-01-14T08:30:00'),
+  },
+  {
+    id: 'alert-5',
+    type: 'pnl',
+    name: 'Stop Loss Alert',
+    condition: 'below',
+    threshold: -1000,
+    enabled: false,
+    channels: ['push', 'telegram', 'discord'],
+    createdAt: new Date('2024-01-14'),
+  },
+]
+
+// Mock Assets Data
+export const mockAssets: Asset[] = [
+  {
+    symbol: 'ETH',
+    name: 'Ethereum',
+    balance: 12.5,
+    price: 3600,
+    value: 45000,
+    change24h: 2.5,
+    chain: 'Ethereum',
+    logo: '/tokens/eth.png',
+  },
+  {
+    symbol: 'BTC',
+    name: 'Bitcoin',
+    balance: 0.58,
+    price: 43103.45,
+    value: 25000,
+    change24h: 1.2,
+    chain: 'Bitcoin',
+    logo: '/tokens/btc.png',
+  },
+  {
+    symbol: 'SOL',
+    name: 'Solana',
+    balance: 150,
+    price: 100,
+    value: 15000,
+    change24h: -3.5,
+    chain: 'Solana',
+    logo: '/tokens/sol.png',
+  },
+  {
+    symbol: 'USDT',
+    name: 'Tether',
+    balance: 8000,
+    price: 1,
+    value: 8000,
+    change24h: 0,
+    chain: 'Ethereum',
+    logo: '/tokens/usdt.png',
+  },
+  {
+    symbol: 'MATIC',
+    name: 'Polygon',
+    balance: 2500,
+    price: 0.968,
+    value: 2420,
+    change24h: 5.2,
+    chain: 'Polygon',
+    logo: '/tokens/matic.png',
+  },
+]
+
+// Helper functions
+export function getBotById(id: string): Bot | undefined {
+  return mockBots.find((bot) => bot.id === id)
+}
+
+export function getTradesByBotId(botId: string): Trade[] {
+  return mockTrades.filter((trade) => trade.botId === botId)
+}
+
+export function getAlertsByBotId(botId: string): Alert[] {
+  return mockAlerts.filter((alert) => alert.botId === botId)
+}

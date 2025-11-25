@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  currency  String   @default("USD")
+  language  String   @default("th")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  wallets  Wallet[]
+  bots     Bot[]
+  alerts   Alert[]
+  trades   Trade[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+// Session for JWT refresh tokens
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Wallet model
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  address   String
+  chain     String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assets Asset[]
+
+  @@unique([userId, address, chain])
+  @@map("wallets")
+}
+
+// Asset model
+model Asset {
+  id        String   @id @default(cuid())
+  walletId  String
+  symbol    String
+  name      String
+  balance   Float
+  price     Float    @default(0)
+  value     Float    @default(0)
+  change24h Float    @default(0)
+  logo      String?
+  updatedAt DateTime @updatedAt
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@unique([walletId, symbol])
+  @@map("assets")
+}
+
+// Bot model
+model Bot {
+  id            String    @id @default(cuid())
+  userId        String
+  name          String
+  type          BotType
+  status        BotStatus @default(STOPPED)
+  pair          String
+  exchange      String
+  config        Json?
+  profit        Float     @default(0)
+  profitPercent Float     @default(0)
+  tradesCount   Int       @default(0)
+  uptime        Int       @default(0)
+  lastStarted   DateTime?
+  lastStopped   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades Trade[]
+  alerts Alert[]
+
+  @@map("bots")
+}
+
+enum BotType {
+  GRID
+  DCA
+  ARBITRAGE
+  CUSTOM
+}
+
+enum BotStatus {
+  RUNNING
+  STOPPED
+  ERROR
+  SYNCING
+}
+
+// Trade model
+model Trade {
+  id        String    @id @default(cuid())
+  userId    String
+  botId     String?
+  type      TradeType
+  pair      String
+  price     Float
+  amount    Float
+  total     Float
+  profit    Float?
+  fee       Float?
+  txHash    String?
+  timestamp DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot  Bot? @relation(fields: [botId], references: [id], onDelete: SetNull)
+
+  @@map("trades")
+}
+
+enum TradeType {
+  BUY
+  SELL
+}
+
+// Alert model
+model Alert {
+  id          String         @id @default(cuid())
+  userId      String
+  botId       String?
+  type        AlertType
+  name        String
+  condition   AlertCondition
+  threshold   Float
+  asset       String?
+  enabled     Boolean        @default(true)
+  channels    String[]       @default([])
+  triggeredAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot  Bot? @relation(fields: [botId], references: [id], onDelete: SetNull)
+
+  @@map("alerts")
+}
+
+enum AlertType {
+  PRICE
+  BOT_STATUS
+  PNL
+  SYSTEM
+}
+
+enum AlertCondition {
+  ABOVE
+  BELOW
+  EQUALS
+  CHANGE
+}
+
+// Portfolio snapshot for historical tracking
+model PortfolioSnapshot {
+  id         String   @id @default(cuid())
+  userId     String
+  totalValue Float
+  profit     Float
+  timestamp  DateTime @default(now())
+
+  @@index([userId, timestamp])
+  @@map("portfolio_snapshots")
+}
