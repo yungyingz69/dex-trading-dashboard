@@ -10,6 +10,7 @@ interface Asset {
   price: number
   value: number
   change24h: number
+  chain: string
   logo?: string
 }
 
